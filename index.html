@@ -1,24 +1,30 @@
-<h1>Dada can count 😁</h1>
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+<section class="container mx-auto px-8">
+<h1 class="text-2xl text-center my-4">Dada can count 😁</h1>
 
-<h2>Make Dada say a number</h2>
+<h2 class="text-xl my-4">Make Dada say a number</h2>
 
 <form onsubmit="handleSay()">
-    <label for="number">Enter a number to play</label>
-    <input type="number" id="number" />
-    <button type="submit">Play</button>
+    <label for="number" class="inline-block min-w-[80px] my-2">Enter a number to play</label>
+    <input type="number" id="number" class="border border-black rounded-xl" /><br />
+    <button type="submit" class="bg-black text-white p-2 rounded-full">Play</button>
 </form>
 
-<h2>Make Dada count</h2>
+<h2 class="text-xl my-4">Make Dada count</h2>
 
 <form onsubmit="handleCount()">
-    <label for="number">Start with</label>
-    <input type="number" id="start" />
-    <label for="number">Count by</label>
-    <input type="number" id="step" value="1" />
-    <label for="number">Count to</label>
-    <input type="number" id="end" />
-    <button type="submit">Play</button>
+    <label for="start" class="inline-block min-w-[80px] my-2">Start with</label>
+    <input type="number" id="start" class="border border-black rounded-xl" /><br />
+    <label for="step" class="inline-block min-w-[80px] my-2">Count by</label>
+    <input type="number" id="step" value="1" class="border border-black rounded-xl" /><br />
+    <label for="end" class="inline-block min-w-[80px] my-2">Count to</label>
+    <input type="number" id="end" class="border border-black rounded-xl" /><br />
+    <button type="submit" class="bg-black text-white p-2 rounded-full">Play</button>
 </form>
+</section>
 
 <audio id="player" src="" autoplay></audio>
 
@@ -93,3 +99,4 @@
         }
     }
 </script>
+</body>
