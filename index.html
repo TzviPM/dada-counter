@@ -1,0 +1,95 @@
+<h1>Dada can count 😁</h1>
+
+<h2>Make Dada say a number</h2>
+
+<form onsubmit="handleSay()">
+    <label for="number">Enter a number to play</label>
+    <input type="number" id="number" />
+    <button type="submit">Play</button>
+</form>
+
+<h2>Make Dada count</h2>
+
+<form onsubmit="handleCount()">
+    <label for="number">Start with</label>
+    <input type="number" id="start" />
+    <label for="number">Count by</label>
+    <input type="number" id="step" value="1" />
+    <label for="number">Count to</label>
+    <input type="number" id="end" />
+    <button type="submit">Play</button>
+</form>
+
+<audio id="player" src="" autoplay></audio>
+
+<script>
+    let player = document.getElementById('player');
+    let number = document.getElementById('number');
+    let start = document.getElementById('start');
+    let step = document.getElementById('step');
+    let end = document.getElementById('end');
+
+    function handleSay() {
+        event.preventDefault();
+        playNum(parseInt(number.value)).catch(err => {
+            alert(err);
+        });
+    }
+
+    async function handleCount() {
+        event.preventDefault();
+
+        let startValue = parseInt(start.value);
+        let endValue = parseInt(end.value);
+        let stepValue = parseInt(step.value);
+        try {
+            for (let i = startValue; i <= endValue; i += stepValue) {
+                await playNum(i);
+            }
+        } catch (err) {
+            alert(err);
+        }
+    }
+
+    function playExact(n) {
+        let audioFile = 'rec' + n;
+        return new Promise((res, rej) => {
+            player.onended = res;
+            player.onerror = rej;
+            player.src = "./" + audioFile + ".m4a";
+        });
+    }
+
+    function playNum(n) {
+        if (n === 0) {
+            return Promise.resolve();
+        }
+        if (n < 0) {
+            return Promise.reject(RangeError('playNum only supports positive numbers'))
+        }
+        if (n > 1000000) {
+            return Promise.reject(RangeError('playNum only supports numbers up to 1 million'))
+        }
+        if (n !== Math.floor(n)) {
+            return Promise.reject(RangeError('playNum only supports whole numbers'))
+        }
+        if (n <= 20) {
+            return playExact(n);
+        }
+        if (n < 100) {
+            let ones = n % 10;
+            let tens = n - ones;
+            return playExact(tens).then(() => playNum(ones));
+        }
+        if (n < 1000) {
+            let tail = n % 100;
+            let head = (n - tail) / 100;
+            return playNum(head).then(() => playExact('Hundred')).then(() => playNum(tail));
+        }
+        if (n < 1000000) {
+            let tail = n % 1000;
+            let head = (n - tail) / 1000;
+            return playNum(head).then(() => playExact('Thousand')).then(() => playNum(tail));
+        }
+    }
+</script>
