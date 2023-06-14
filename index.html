@@ -38,7 +38,16 @@
 
     function handleSay() {
         event.preventDefault();
-        playNum(parseInt(number.value)).catch(err => {
+        let input = parseInt(number.value);
+        if (input == 69) {
+            playAudio('egg69.m4a').then(() => alert('Nice!'));
+            return;
+        }
+        if (input == 770) {
+            playAudio('egg770.m4a').then(() => alert('B"H!!!'));
+            return;
+        }
+        playNum(input).catch(err => {
             alert(err);
         });
     }
@@ -58,13 +67,16 @@
         }
     }
 
-    function playExact(n) {
-        let audioFile = 'rec' + n;
+    function playAudio(name) {
         return new Promise((res, rej) => {
             player.onended = res;
             player.onerror = rej;
-            player.src = "./" + audioFile + ".m4a";
+            player.src = "./" + name;
         });
+    }
+
+    function playExact(n) {
+        return playAudio(`rec${n}.m4a`);
     }
 
     function playNum(n) {
