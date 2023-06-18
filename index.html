@@ -1,115 +1,203 @@
 <head>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-<section class="container mx-auto px-8">
-<h1 class="text-2xl text-center my-4">Dada can count 😁</h1>
+  <section class="container mx-auto px-8">
+    <h1 class="text-2xl text-center my-4">Dada can count 😁</h1>
 
-<h2 class="text-xl my-4">Make Dada say a number</h2>
+    <h2 class="text-xl my-4">Make Dada say a number</h2>
 
-<form onsubmit="handleSay()">
-    <label for="number" class="inline-block min-w-[80px] my-2">Enter a number to play</label>
-    <input type="number" id="number" class="border border-black rounded-full p-1 my-2" /><br />
-    <button type="submit" class="bg-black text-white p-2 rounded-full">Play</button>
-</form>
+    <form onsubmit="handleSay()">
+      <label for="number" class="inline-block min-w-[80px] my-2"
+        >Enter a number to play</label
+      >
+      <input
+        id="number"
+        class="border border-black rounded-full p-1 my-2"
+      /><br />
+      <button type="submit" class="bg-black text-white p-2 rounded-full">
+        Play
+      </button>
+    </form>
 
-<h2 class="text-xl my-4">Make Dada count</h2>
+    <h2 class="text-xl my-4">Make Dada count</h2>
 
-<form onsubmit="handleCount()">
-    <label for="start" class="inline-block min-w-[80px] my-2">Start with</label>
-    <input type="number" id="start" class="border border-black rounded-full p-1 my-2" /><br />
-    <label for="step" class="inline-block min-w-[80px] my-2">Count by</label>
-    <input type="number" id="step" value="1" class="border border-black rounded-full p-1 my-2" /><br />
-    <label for="end" class="inline-block min-w-[80px] my-2">Count to</label>
-    <input type="number" id="end" class="border border-black rounded-full p-1 my-2" /><br />
-    <button type="submit" class="bg-black text-white p-2 rounded-full">Play</button>
-</form>
-<p class="text-center">Made with ❤️ by <a href="https://www.tzvipm.dev/" class="text-blue-500 underline">@TzviPM</a></p>
-</section>
+    <form onsubmit="handleCount()">
+      <label for="start" class="inline-block min-w-[80px] my-2"
+        >Start with</label
+      >
+      <input
+        id="start"
+        class="border border-black rounded-full p-1 my-2"
+      /><br />
+      <label for="step" class="inline-block min-w-[80px] my-2">Count by</label>
+      <input
+        id="step"
+        value="1"
+        class="border border-black rounded-full p-1 my-2"
+      /><br />
+      <label for="end" class="inline-block min-w-[80px] my-2">Count to</label>
+      <input
+        id="end"
+        class="border border-black rounded-full p-1 my-2"
+      /><br />
+      <button type="submit" class="bg-black text-white p-2 rounded-full">
+        Play
+      </button>
+    </form>
+    <p class="text-center">
+      Made with ❤️ by
+      <a href="https://www.tzvipm.dev/" class="text-blue-500 underline"
+        >@TzviPM</a
+      >
+    </p>
+  </section>
 
-<audio id="player" src="" autoplay></audio>
+  <audio id="player" src="" autoplay></audio>
 
-<script>
-    let player = document.getElementById('player');
-    let number = document.getElementById('number');
-    let start = document.getElementById('start');
-    let step = document.getElementById('step');
-    let end = document.getElementById('end');
+  <script>
+    const MAX_NUMBER = 999999999;
+    const MIN_NUMBER = -MAX_NUMBER;
+    const DECIMAL_PLACES = 9;
 
-    function handleSay() {
-        event.preventDefault();
-        let input = parseInt(number.value);
+    let player = document.getElementById("player");
+    let number = document.getElementById("number");
+    let start = document.getElementById("start");
+    let step = document.getElementById("step");
+    let end = document.getElementById("end");
+
+    async function handleSay() {
+      event.preventDefault();
+      try {
+        let input = parseFloat(number.value);
+        if (input < MIN_NUMBER) {
+          throw new RangeError("start must be at least " + MIN_NUMBER);
+        }
+        if (Math.floor(input) > MAX_NUMBER) {
+          throw new RangeError("end must be at most " + MAX_NUMBER);
+        }
         if (input == 69) {
-            playAudio('egg69.m4a').then(() => alert('Nice!'));
-            return;
+          playAudio("egg69.m4a").then(() => alert("Nice!"));
+          return;
         }
         if (input == 770) {
-            playAudio('egg770.m4a').then(() => alert('B"H!!!'));
-            return;
+          playAudio("egg770.m4a").then(() => alert('B"H!!!'));
+          return;
         }
-        playNum(input).catch(err => {
-            alert(err);
-        });
+        await playNum(input);
+      } catch (err) {
+        alert(err);
+      }
     }
 
     async function handleCount() {
-        event.preventDefault();
+      event.preventDefault();
 
-        let startValue = parseInt(start.value);
-        let endValue = parseInt(end.value);
-        let stepValue = parseInt(step.value);
-        try {
-            for (let i = startValue; i <= endValue; i += stepValue) {
-                await playNum(i);
-            }
-        } catch (err) {
-            alert(err);
+      try {
+        let startValue = parseFloat(start.value);
+        let endValue = parseFloat(end.value);
+        let stepValue = parseFloat(step.value);
+
+        if (startValue >= endValue) {
+          throw new Error("start must be less than end");
         }
+        if (stepValue <= 0) {
+          throw new RangeError("step must be positive");
+        }
+        if (startValue < MIN_NUMBER) {
+          throw new RangeError("start must be at least " + MIN_NUMBER);
+        }
+        if (endValue > MAX_NUMBER) {
+          throw new RangeError("end must be at most " + MAX_NUMBER);
+        }
+
+        for (let i = startValue; i <= endValue; i += stepValue) {
+          await playNum(i);
+        }
+      } catch (err) {
+        alert(err);
+      }
     }
 
     function playAudio(name) {
-        return new Promise((res, rej) => {
-            player.onended = res;
-            player.onerror = rej;
-            player.src = "./" + name;
-        });
+      return new Promise((res, rej) => {
+        player.onended = res;
+        player.onerror = rej;
+        player.src = "./" + name;
+      });
     }
 
-    function playExact(n) {
-        return playAudio(`rec${n}.m4a`);
+    async function playExact(n) {
+      await playAudio(`rec${n}.mp3`);
+    }
+    
+    async function playDecimal(n) {
+      if (n <= 0) {
+        throw new RangeError("playDecimal only supports positive numbers");
+      }
+      if (n >= 1) {
+        throw new RangeError("playDecimal only supports numbers less than 1");
+      }
+      let digitString = n.toFixed(DECIMAL_PLACES).slice(2).replace(/0+$/, "");
+      for (let i = 0; i < digitString.length; i++) {
+        let digit = parseInt(digitString[i]);
+        await playExact(digit);
+      }
     }
 
-    function playNum(n) {
-        if (n === 0) {
-            return Promise.resolve();
+    async function playNum(n) {
+      if (n < MIN_NUMBER) {
+        throw new RangeError(
+          "playNum only supports numbers down to " + MIN_NUMBER
+        );
+      }
+      if (Math.floor(n) > MAX_NUMBER) {
+        throw new RangeError(
+          "playNum only supports numbers up to " + MAX_NUMBER
+        );
+      }
+      if (n < 0) {
+        await playExact("Negative");
+        return playNum(-n);
+      }
+      if (n !== Math.floor(n)) {
+        let fixed = n.toFixed(DECIMAL_PLACES);
+        let [whole, decimal] = fixed.split(".");
+        if (decimal.replace(/0+$/, "") === "") {
+          return playNum(parseInt(whole));
         }
-        if (n < 0) {
-            return Promise.reject(RangeError('playNum only supports positive numbers'))
-        }
-        if (n > 1000000) {
-            return Promise.reject(RangeError('playNum only supports numbers up to 1 million'))
-        }
-        if (n !== Math.floor(n)) {
-            return Promise.reject(RangeError('playNum only supports whole numbers'))
-        }
-        if (n <= 20) {
-            return playExact(n);
-        }
-        if (n < 100) {
-            let ones = n % 10;
-            let tens = n - ones;
-            return playExact(tens).then(() => playNum(ones));
-        }
-        if (n < 1000) {
-            let tail = n % 100;
-            let head = (n - tail) / 100;
-            return playNum(head).then(() => playExact('Hundred')).then(() => playNum(tail));
-        }
-        if (n < 1000000) {
-            let tail = n % 1000;
-            let head = (n - tail) / 1000;
-            return playNum(head).then(() => playExact('Thousand')).then(() => playNum(tail));
-        }
+        await playNum(parseInt(whole));
+        await playExact("Point");
+        await playDecimal(n - Math.floor(n));
+        return;
+      }
+      if (n <= 20) {
+        return playExact(n);
+      }
+      if (n < 100) {
+        let ones = n % 10;
+        let tens = n - ones;
+        await playExact(tens);
+        await playNum(ones);
+      } else if (n < 1000) {
+        let tail = n % 100;
+        let head = (n - tail) / 100;
+        await playNum(head);
+        await playExact("Hundred");
+        await playNum(tail);
+      } else if (n < 1000000) {
+        let tail = n % 1000;
+        let head = (n - tail) / 1000;
+        await playNum(head);
+        await playExact("Thousand");
+        await playNum(tail);
+      } else if (n < 1000000000) {
+        let tail = n % 1000000;
+        let head = (n - tail) / 1000000;
+        await playNum(head);
+        await playExact("Million");
+        await playNum(tail);
+      }
     }
-</script>
+  </script>
 </body>
