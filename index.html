@@ -172,6 +172,9 @@
         await playDecimal(n - Math.floor(n));
         return;
       }
+      if (n === 0) {
+        return;
+      }
       if (n <= 20) {
         return playExact(n);
       }
