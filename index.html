@@ -4,9 +4,9 @@
 </head>
 <body>
   <section class="container mx-auto px-8">
-    <h1 class="text-2xl text-center my-4">Dada can count 😁</h1>
+    <h1 class="text-2xl text-center my-4">Danny can count too 😁</h1>
 
-    <h2 class="text-xl my-4">Make Dada say a number</h2>
+    <h2 class="text-xl my-4">Make Danny say a number</h2>
 
     <form onsubmit="handleSay()">
       <label for="number" class="inline-block min-w-[80px] my-2"
@@ -21,7 +21,7 @@
       </button>
     </form>
 
-    <h2 class="text-xl my-4">Make Dada count</h2>
+    <h2 class="text-xl my-4">Make Danny count</h2>
 
     <form onsubmit="handleCount()">
       <label for="start" class="inline-block min-w-[80px] my-2"
@@ -147,61 +147,64 @@
     }
 
     async function playNum(n) {
-      if (n < MIN_NUMBER) {
-        throw new RangeError(
-          "playNum only supports numbers down to " + MIN_NUMBER
-        );
-      }
-      if (Math.floor(n) > MAX_NUMBER) {
-        throw new RangeError(
-          "playNum only supports numbers up to " + MAX_NUMBER
-        );
-      }
-      if (n < 0) {
-        await playExact("Negative");
-        return playNum(-n);
-      }
-      if (n !== Math.floor(n)) {
-        let fixed = n.toFixed(DECIMAL_PLACES);
-        let [whole, decimal] = fixed.split(".");
-        if (decimal.replace(/0+$/, "") === "") {
-          return playNum(parseInt(whole));
+      async function playNum(n, recursiveCall = true) {
+        if (n < MIN_NUMBER) {
+          throw new RangeError(
+            "playNum only supports numbers down to " + MIN_NUMBER
+          );
         }
-        await playNum(parseInt(whole));
-        await playExact("Point");
-        await playDecimal(n - Math.floor(n));
-        return;
+        if (Math.floor(n) > MAX_NUMBER) {
+          throw new RangeError(
+            "playNum only supports numbers up to " + MAX_NUMBER
+          );
+        }
+        if (n < 0) {
+          await playExact("Negative");
+          return playNum(-n);
+        }
+        if (n !== Math.floor(n)) {
+          let fixed = n.toFixed(DECIMAL_PLACES);
+          let [whole, decimal] = fixed.split(".");
+          if (decimal.replace(/0+$/, "") === "") {
+            return playNum(parseInt(whole));
+          }
+          await playNum(parseInt(whole));
+          await playExact("Point");
+          await playDecimal(n - Math.floor(n));
+          return;
+        }
+        if (recursiveCall && n === 0) {
+          return;
+        }
+        if (n <= 20) {
+          return playExact(n);
+        }
+        if (n < 100) {
+          let ones = n % 10;
+          let tens = n - ones;
+          await playExact(tens);
+          await playNum(ones);
+        } else if (n < 1000) {
+          let tail = n % 100;
+          let head = (n - tail) / 100;
+          await playNum(head);
+          await playExact("Hundred");
+          await playNum(tail);
+        } else if (n < 1000000) {
+          let tail = n % 1000;
+          let head = (n - tail) / 1000;
+          await playNum(head);
+          await playExact("Thousand");
+          await playNum(tail);
+        } else if (n < 1000000000) {
+          let tail = n % 1000000;
+          let head = (n - tail) / 1000000;
+          await playNum(head);
+          await playExact("Million");
+          await playNum(tail);
+        }
       }
-      if (n === 0) {
-        return;
-      }
-      if (n <= 20) {
-        return playExact(n);
-      }
-      if (n < 100) {
-        let ones = n % 10;
-        let tens = n - ones;
-        await playExact(tens);
-        await playNum(ones);
-      } else if (n < 1000) {
-        let tail = n % 100;
-        let head = (n - tail) / 100;
-        await playNum(head);
-        await playExact("Hundred");
-        await playNum(tail);
-      } else if (n < 1000000) {
-        let tail = n % 1000;
-        let head = (n - tail) / 1000;
-        await playNum(head);
-        await playExact("Thousand");
-        await playNum(tail);
-      } else if (n < 1000000000) {
-        let tail = n % 1000000;
-        let head = (n - tail) / 1000000;
-        await playNum(head);
-        await playExact("Million");
-        await playNum(tail);
-      }
+      return await playNum(n, false);
     }
   </script>
 </body>
